@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy New Year Sweeshi 🎆</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<style>
+/* ========== RESET ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at bottom, #020024, #090979, #000);
+  height: 100vh;
+  overflow: hidden;
+  color: white;
+}
+
+/* ========== SCENE ========== */
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 1200px;
+}
+
+/* ========== TITLE ========== */
+.title {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  animation: float 6s ease-in-out infinite;
+}
+
+.title h1 {
+  font-size: clamp(2.2rem, 7vw, 5.5rem);
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 10px #0ff, 0 0 40px #0ff;
+}
+
+.title h2 {
+  margin-top: 10px;
+  font-size: clamp(1.4rem, 4vw, 2.6rem);
+  color: gold;
+}
+
+/* ========== NAME ========== */
+.name {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(1.3rem, 4vw, 2.4rem);
+  color: #ffb6ff;
+  text-align: center;
+  text-shadow: 0 0 12px #ff6fff, 0 0 40px #ffb6ff;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+/* ========== QUOTES ========== */
+.quote-box {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90%, 700px);
+  font-size: clamp(1rem, 3.5vw, 1.7rem);
+  text-align: center;
+  color: #e0ffff;
+  opacity: 0;
+  animation: quoteFade 6s infinite;
+  text-shadow: 0 0 10px rgba(0,255,255,0.6);
+}
+
+/* ========== FOOTER ========== */
+.footer {
+  position: absolute;
+  bottom: env(safe-area-inset-bottom, 16px);
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  opacity: 0.75;
+  padding: 6px;
+}
+
+/* ========== CANVAS ========== */
+canvas {
+  position: absolute;
+  inset: 0;
+  touch-action: manipulation;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes float {
+  0%,100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -18px); }
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 12px #ff6fff; }
+  to { text-shadow: 0 0 30px #ff6fff, 0 0 60px #ffb6ff; }
+}
+
+@keyframes quoteFade {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ========== MOBILE OPTIMIZATION ========== */
+@media (max-width: 768px) {
+  .title { top: 14%; }
+  .name { top: 36%; }
+  .quote-box { top: 54%; }
+}
+
+@media (max-width: 480px) {
+  .title h1 { letter-spacing: 0.12em; }
+  .footer { font-size: 0.7rem; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="scene" id="scene">
+  <canvas id="fireworks"></canvas>
+
+  <div class="title">
+    <h1>HAPPY NEW YEAR</h1>
+    <h2>✨ 2026 ✨</h2>
+  </div>
+
+  <div class="name">💖 Dear Sweeshi 💖</div>
+
+  <div class="quote-box" id="quote"></div>
+
+  <div class="footer">May your year sparkle with joy ✨</div>
+</div>
+
+<script>
+/* ====== DISABLE HEAVY PARALLAX ON MOBILE ====== */
+if (window.innerWidth > 768) {
+  const scene = document.getElementById('scene');
+  document.addEventListener('mousemove', e => {
+    const x = (e.clientX / innerWidth - 0.5) * 20;
+    const y = (e.clientY / innerHeight - 0.5) * -20;
+    scene.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+  });
+}
+
+/* ====== QUOTES ====== */
+const quotes = [
+  "✨ Sweeshi, may your year shine brighter than fireworks.",
+  "🌸 New beginnings, beautiful memories, endless happiness.",
+  "🎯 May every dream you chase come true.",
+  "❤️ Health, love, and success always.",
+  "🚀 This year is yours — make it magical."
+];
+
+let i = 0;
+const quoteEl = document.getElementById('quote');
+
+function rotateQuote() {
+  quoteEl.textContent = quotes[i];
+  i = (i + 1) % quotes.length;
+}
+rotateQuote();
+setInterval(rotateQuote, 6000);
+
+/* ====== FIREWORKS (TOUCH FRIENDLY) ====== */
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
+resize();
+addEventListener('resize', resize);
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.vx = (Math.random() - 0.5) * 5;
+    this.vy = (Math.random() - 0.5) * 5;
+    this.life = 80;
+    this.color = color;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life--;
+  }
+}
+
+let particles = [];
+
+function explode(x, y) {
+  const colors = ['#ff6fff','#ffd700','#00ffff','#ff6699'];
+  for (let i = 0; i < 70; i++) {
+    particles.push(new Particle(x, y, colors[Math.random()*colors.length|0]));
+  }
+}
+
+canvas.addEventListener('pointerdown', e => {
+  explode(e.clientX, e.clientY);
+});
+
+setInterval(() => explode(Math.random()*canvas.width, Math.random()*canvas.height/2), 1600);
+
+(function animate() {
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+})();
+</script>
+
+</body>
+</html>
